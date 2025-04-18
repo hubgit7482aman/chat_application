@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 dotenv.config();
 const app = express();
@@ -15,10 +16,13 @@ app.use(express.json());
 // express.json() ek middleware hai jo request body ko json mai parse karta hai taki us data ko req.body k throuh access kar sake
 
 app.use(cookieParser());
-
-
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 app.use("/api/auth", authRoutes); // if user visite this path then authRoutes will run
 app.use("/api/message", messageRoutes);
+
 
 app.listen(PORT, () => {
   console.log("server is running on port:" + PORT);
