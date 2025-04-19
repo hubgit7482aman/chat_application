@@ -16,13 +16,14 @@ app.use(express.json());
 // express.json() ek middleware hai jo request body ko json mai parse karta hai taki us data ko req.body k throuh access kar sake
 
 app.use(cookieParser());
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use("/api/auth", authRoutes); // if user visite this path then authRoutes will run
-app.use("/api/message", messageRoutes);
-
+app.use("/api/messages", messageRoutes);
 
 app.listen(PORT, () => {
   console.log("server is running on port:" + PORT);

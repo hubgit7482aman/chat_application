@@ -2,6 +2,8 @@ import cloudinary from "../lib/cloudinary.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 
+
+
 export const getUsersForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id; // this is a function after protected middleware, that is why we are getting user id from req
@@ -9,7 +11,7 @@ export const getUsersForSidebar = async (req, res) => {
     const filteredUsers = await User.find({
       _id: { $ne: loggedInUserId },
     }).select("-password"); // ne-> not equal and select everything for those user except password
-    res.select(200).json(filteredUsers);
+    res.status(200).json(filteredUsers);
   } catch (error) {
     console.log("Error in getUsersForSidebar:", error.message);
     res.status(400).json({ error: "Internal server error" });
@@ -62,3 +64,5 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
