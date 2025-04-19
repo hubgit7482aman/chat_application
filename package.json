@@ -4,8 +4,8 @@
   "description": "A full-stack real-time chat application built with the **MERN stack (MongoDB, Express.js, React, Node.js)** and **Socket.IO** for instant messaging. The application uses **HTTP-only cookies** for secure authentication and session management, ensuring a smooth and secure user experience.",
   "main": "index.js",
   "scripts": {
-    "build": "",
-    "start": ""
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "npm run start --prefix backend"
   },
   "keywords": [],
   "author": "",
