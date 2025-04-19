@@ -1,19 +1,24 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 
-export const useAuthStore = create((set) => ({
+const BASE_URL = "http://localhost:5001";
+
+export const useAuthStore = create((set, get) => ({
   authUser: null,
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
   onlineUsers: [],
+  socket: null, // state for socket connection
 
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
+      get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth", error);
       set({ authUser: null });
@@ -44,6 +49,8 @@ export const useAuthStore = create((set) => ({
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
+
+      get().connectSocket(); // after login connect to the socket
     } catch (error) {
       console.error("Login error:", error);
       const message = error?.response?.data?.message || "Login failed";
@@ -59,6 +66,7 @@ export const useAuthStore = create((set) => ({
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
+      get().disconnectSocket();
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -76,6 +84,30 @@ export const useAuthStore = create((set) => ({
       toast.error(message);
     } finally {
       set({ isUpdatingProfile: false });
+    }
+  },
+
+  connectSocket: () => {
+    const { authUser, socket } = get();
+    if (!authUser || socket?.connected) return; // if user is not logged in or socket is already connected then return
+    const newsocket = io(BASE_URL, {
+      query: {
+        userId: authUser._id,
+      },
+    }); // Replace with your backend server URL
+    newsocket.connect();
+    set({ socket: newsocket }); // Set the socket in the store
+
+    newsocket.on("getOnlineUsers", (userIds) => {
+      set({ onlineUsers: userIds });
+    }); 
+  },
+
+  disconnectSocket: () => {
+    const socket = get().socket;
+    if (socket) {
+      socket.disconnect();
+      set({ socket: null }); // Set the socket to null in the store
     }
   },
 }));
