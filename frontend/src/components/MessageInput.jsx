@@ -17,7 +17,7 @@ const MessageInput = () => {
       toast.error("Please select an image file");
       return;
     }
-    if (file.size > 1024 * 1024 * 5) {
+    if (file.size > 1024 * 1024 * 100000000) {
       toast.error("Image size should be less than 5mb");
       return;
     }
